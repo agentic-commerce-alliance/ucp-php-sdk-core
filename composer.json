@@ -1,0 +1,15 @@
+{
+    "name": "ucp-php-sdk/core",
+    "description": "Core library for the UCP PHP SDK",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1",
+        "phpseclib/phpseclib": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ucp\\Sdk\\": "src/"
+        }
+    }
+}
