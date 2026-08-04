@@ -31,17 +31,14 @@ final class MonetaryAmount
     }
 
     /**
-     * Number of minor-unit decimals for the given currency.
+     * Number of minor-unit decimals for the given (already-uppercased) currency.
      *
-     * The currency code is matched case-insensitively. Unknown codes and ISO
-     * 4217 entries whose minor unit is listed as "N.A." (e.g. XAU, XDR) fall
-     * back to 2. This is the SDK's chosen default, not a value defined by ISO
-     * 4217.
+     * Unknown codes and ISO 4217 entries whose minor unit is listed as "N.A."
+     * (e.g. XAU, XDR) fall back to 2. This is the SDK's chosen default, not a
+     * value defined by ISO 4217.
      */
-    public static function exponent(string $currency): int
+    private static function exponent(string $currency): int
     {
-        $currency = strtoupper($currency);
-
         if (in_array($currency, self::ZERO_DECIMAL_CURRENCIES, true)) {
             return 0;
         }

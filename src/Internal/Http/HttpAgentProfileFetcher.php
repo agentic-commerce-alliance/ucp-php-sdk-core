@@ -7,11 +7,11 @@ namespace Ucp\Sdk\Internal\Http;
 use Ucp\Sdk\Internal\Service\UrlSafetyValidator;
 use Ucp\Sdk\Model\Profile\PlatformProfile;
 use Ucp\Sdk\Repository\PlatformProfileCacheRepositoryInterface;
+use Ucp\Sdk\Service\AgentProfileFetcherInterface;
 use Ucp\Sdk\Service\HttpClientInterface;
-use Ucp\Sdk\Service\RequestScopedAgentProfileFetcherInterface;
 
 /** @internal */
-final class HttpAgentProfileFetcher implements RequestScopedAgentProfileFetcherInterface
+final class HttpAgentProfileFetcher implements AgentProfileFetcherInterface
 {
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -24,15 +24,7 @@ final class HttpAgentProfileFetcher implements RequestScopedAgentProfileFetcherI
 
     public function fetch(string $uri): PlatformProfile
     {
-        return $this->fetchForAllowedHosts($uri, []);
-    }
-
-    public function fetchForAllowedHosts(string $uri, array $allowedProfileHosts): PlatformProfile
-    {
-        $validatedUri = $this->urlSafetyValidator->validateAndResolve(
-            $uri,
-            $allowedProfileHosts === [] ? null : $allowedProfileHosts,
-        );
+        $validatedUri = $this->urlSafetyValidator->validateAndResolve($uri);
 
         $cached = $this->cacheRepository->find($uri);
         if ($cached !== null) {

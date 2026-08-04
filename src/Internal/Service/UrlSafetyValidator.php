@@ -34,15 +34,8 @@ final class UrlSafetyValidator
         $this->validateAndResolve($uri);
     }
 
-    /**
-     * @param list<string>|null $allowedHostsOverride when non-null, replaces the
-     *        constructor allowlist for this call (e.g. the resolved sales channel's
-     *        allowed profile hosts) so the SSRF gate is scoped per request
-     */
-    public function validateAndResolve(string $uri, ?array $allowedHostsOverride = null): ValidatedProfileUri
+    public function validateAndResolve(string $uri): ValidatedProfileUri
     {
-        $allowedHosts = $allowedHostsOverride ?? $this->allowedHosts;
-
         $parts = parse_url($uri);
         $scheme = strtolower((string) ($parts['scheme'] ?? ''));
         $host = strtolower((string) ($parts['host'] ?? ''));
@@ -80,15 +73,15 @@ final class UrlSafetyValidator
 
         $resolution = $this->assertHostDoesNotResolveToBlockedAddress($host);
 
-        if ($allowedHosts === [] && $this->profileFetchingDevelopmentMode && $this->isLocalHost($host)) {
+        if ($this->allowedHosts === [] && $this->profileFetchingDevelopmentMode && $this->isLocalHost($host)) {
             return new ValidatedProfileUri($uri, $host, $port, $resolution['resolved_ip'], $resolution['uses_dns']);
         }
 
-        if ($allowedHosts === []) {
+        if ($this->allowedHosts === []) {
             throw new ValidationException(sprintf('Profile host "%s" is not allowed.', $host));
         }
 
-        foreach ($allowedHosts as $allowedHost) {
+        foreach ($this->allowedHosts as $allowedHost) {
             $allowedHost = strtolower($allowedHost);
 
             if ($host === $allowedHost || str_ends_with($host, '.' . $allowedHost)) {
